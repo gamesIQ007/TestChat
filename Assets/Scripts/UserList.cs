@@ -46,10 +46,8 @@ namespace NetworkChat
         /// <param name="userId">ID пользователя</param>
         /// <param name="userNickname">Ник пользователя</param>
         [Server]
-		public void SvAddCurrentUser(int userId, string userNickname)
+		public void SvAddCurrentUser(UserData data)
 		{
-			UserData data = new UserData(userId, userNickname);
-
 			m_AllUsersData.Add(data);
 
 			if (isServerOnly)
@@ -59,7 +57,7 @@ namespace NetworkChat
 
 			for (int i = 0; i < m_AllUsersData.Count; i++)
             {
-				RpcAddCurrentUser(m_AllUsersData[i].ID, m_AllUsersData[i].Nickname);
+				RpcAddCurrentUser(m_AllUsersData[i]);
 			}
 		}
 
@@ -68,18 +66,18 @@ namespace NetworkChat
 		/// </summary>
 		/// <param name="userId">ID пользователя</param>
 		[Server]
-		public void SvRemoveCurrentUser(int userId)
+		public void SvRemoveCurrentUser(UserData data)
 		{
 			for (int i = 0; i < m_AllUsersData.Count; i++)
 			{
-				if (m_AllUsersData[i].ID == userId)
+				if (m_AllUsersData[i].ID == data.ID)
                 {
 					m_AllUsersData.RemoveAt(i);
 					break;
                 }
 			}
 
-			RpcRemoveCurrentUser(userId);
+			RpcRemoveCurrentUser(data);
 		}
 
 		/// <summary>
@@ -97,15 +95,13 @@ namespace NetworkChat
 		/// <param name="userId">ID пользователя</param>
 		/// <param name="userNickname">Ник пользователя</param>
 		[ClientRpc]
-		private void RpcAddCurrentUser(int userId, string userNickname)
+		private void RpcAddCurrentUser(UserData data)
 		{
 			if (isClient && isServer)
             {
 				UpdateUserList?.Invoke(m_AllUsersData);
 				return;
             }
-
-			UserData data = new UserData(userId, userNickname);
 
 			m_AllUsersData.Add(data);
 
@@ -117,11 +113,11 @@ namespace NetworkChat
 		/// </summary>
 		/// <param name="userId">ID пользователя</param>
 		[ClientRpc]
-		private void RpcRemoveCurrentUser(int userId)
+		private void RpcRemoveCurrentUser(UserData data)
 		{
 			for (int i = 0; i < m_AllUsersData.Count; i++)
 			{
-				if (m_AllUsersData[i].ID == userId)
+				if (m_AllUsersData[i].ID == data.ID)
 				{
 					m_AllUsersData.RemoveAt(i);
 					break;

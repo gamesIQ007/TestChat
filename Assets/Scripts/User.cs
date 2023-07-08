@@ -5,28 +5,6 @@ using Mirror;
 namespace NetworkChat
 {
     /// <summary>
-    /// Данные пользователя
-    /// </summary>
-    [System.Serializable]
-    public class UserData
-    {
-        /// <summary>
-        /// ID
-        /// </summary>
-        public int ID;
-        /// <summary>
-        /// Ник
-        /// </summary>
-        public string Nickname;
-
-        public UserData(int id, string nickname)
-        {
-            ID = id;
-            Nickname = nickname;
-        }
-    }
-
-    /// <summary>
     /// Пользователь
     /// </summary>
     public class User : NetworkBehaviour
@@ -52,7 +30,7 @@ namespace NetworkChat
         /// <summary>
         /// Получено сообщение из чата
         /// </summary>
-        public static UnityAction<int, string> ReceiveMessageToChat;
+        public static UnityAction<UserData, string> ReceiveMessageToChat;
 
         /// <summary>
         /// Данные пользователя
@@ -92,7 +70,7 @@ namespace NetworkChat
         {
             base.OnStopServer();
 
-            UserList.Instance.SvRemoveCurrentUser(m_Data.ID);
+            UserList.Instance.SvRemoveCurrentUser(m_Data);
         }
 
 
@@ -105,25 +83,25 @@ namespace NetworkChat
         {
             m_Data.Nickname = m_UIMessageInputField.GetNickname();
 
-            CmdAddUser(m_Data.ID, m_Data.Nickname);
+            CmdAddUser(m_Data);
         }
 
         /// <summary>
         /// Добавить пользователя
         /// </summary>
         [Command]
-        private void CmdAddUser(int userId, string nickname)
+        private void CmdAddUser(UserData data)
         {
-            UserList.Instance.SvAddCurrentUser(userId, nickname);
+            UserList.Instance.SvAddCurrentUser(data);
         }
 
         /// <summary>
         /// Удалить пользователя
         /// </summary>
         [Command]
-        private void CmdRemoveUser(int userId)
+        private void CmdRemoveUser(UserData data)
         {
-            UserList.Instance.SvRemoveCurrentUser(userId);
+            UserList.Instance.SvRemoveCurrentUser(data);
         }
 
 
@@ -138,7 +116,7 @@ namespace NetworkChat
 
             if (m_UIMessageInputField.IsEmpty) return;
 
-            CmdSendMessageToChat(m_Data.ID, m_UIMessageInputField.GetString());
+            CmdSendMessageToChat(m_Data, m_UIMessageInputField.GetString());
 
             m_UIMessageInputField.ClearString();
         }
@@ -148,11 +126,11 @@ namespace NetworkChat
         /// </summary>
         /// <param name="message">Сообщение</param>
         [Command]
-        private void CmdSendMessageToChat(int userId, string message)
+        private void CmdSendMessageToChat(UserData data, string message)
         {
             Debug.Log($"User send message to server. Message: {message}");
 
-            SvPostMessage(userId, message);
+            SvPostMessage(data, message);
         }
 
         /// <summary>
@@ -160,11 +138,11 @@ namespace NetworkChat
         /// </summary>
         /// <param name="message">Сообщение</param>
         [Server]
-        private void SvPostMessage(int userId, string message)
+        private void SvPostMessage(UserData data, string message)
         {
             Debug.Log($"Server received message by user. Message: {message}");
 
-            RpcReceiveMessage(userId, message);
+            RpcReceiveMessage(data, message);
         }
 
         /// <summary>
@@ -172,11 +150,11 @@ namespace NetworkChat
         /// </summary>
         /// <param name="message">Сообщение</param>
         [ClientRpc]
-        private void RpcReceiveMessage(int userId, string message)
+        private void RpcReceiveMessage(UserData data, string message)
         {
             Debug.Log($"User received message. Message: {message}");
 
-            ReceiveMessageToChat?.Invoke(userId, message);
+            ReceiveMessageToChat?.Invoke(data, message);
         }
     }
 }

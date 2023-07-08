@@ -45,9 +45,9 @@ namespace NetworkChat
         #endregion
 
 
-        private void OnReceiveMessageToChat(int userId, string message)
+        private void OnReceiveMessageToChat(UserData data, string message)
         {
-            AppendMessage(userId, message);
+            AppendMessage(data, message);
         }
 
         private void OnUpdateUserList(List<UserData> userList)
@@ -72,15 +72,15 @@ namespace NetworkChat
         /// Опубликовать сообщение
         /// </summary>
         /// <param name="message">Сообщение</param>
-        private void AppendMessage(int userId, string message)
+        private void AppendMessage(UserData data, string message)
         {
             UIMessageBox messageBox = Instantiate(m_MessageBox);
 
             messageBox.transform.SetParent(m_MessagePanel);
-            messageBox.SetText(userId + ": " + message);
+            messageBox.SetText(data.ID + ": " + message);
             messageBox.transform.localScale = Vector3.one;
 
-            if (userId == User.Local.Data.ID)
+            if (data.ID == User.Local.Data.ID)
             {
                 messageBox.SetStyleBySelf();
             }
