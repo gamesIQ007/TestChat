@@ -77,7 +77,7 @@ namespace NetworkChat
             UIMessageBox messageBox = Instantiate(m_MessageBox);
 
             messageBox.transform.SetParent(m_MessagePanel);
-            messageBox.SetText(data.ID + ": " + message);
+            messageBox.SetText(data.Nickname + ": " + message);
             messageBox.transform.localScale = Vector3.one;
 
             if (data.ID == User.Local.Data.ID)
