@@ -88,6 +88,8 @@ namespace NetworkChat
             {
                 messageBox.SetStyleBySender();
             }
+
+            messageBox.SetBGSize();
         }
     }
 }
