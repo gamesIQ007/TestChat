@@ -24,6 +24,7 @@ namespace NetworkChat
         /// Список всех пользователей
         /// </summary>
         [SerializeField] private List<UserData> m_AllUsersData = new List<UserData>();
+		public List<UserData> AllUsersData => m_AllUsersData;
 
 
         private void Awake()

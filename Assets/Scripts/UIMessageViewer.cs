@@ -74,22 +74,43 @@ namespace NetworkChat
         /// <param name="message">Сообщение</param>
         private void AppendMessage(UserData data, string message)
         {
-            UIMessageBox messageBox = Instantiate(m_MessageBox);
+            bool containUsername = false;
+            bool showMessage = false;
 
-            messageBox.transform.SetParent(m_MessagePanel);
-            messageBox.SetText(data.Nickname + ": " + message);
-            messageBox.transform.localScale = Vector3.one;
+            for (int i = 0; i < UserList.Instance.AllUsersData.Count; i++)
+            {
+                if (message.StartsWith(UserList.Instance.AllUsersData[i].Nickname))
+                {
+                    containUsername = true;
+                    if (User.Local.Data.Nickname == UserList.Instance.AllUsersData[i].Nickname)
+                    {
+                        showMessage = true;
+                    }
+                }
+            }
 
             if (data.ID == User.Local.Data.ID)
             {
-                messageBox.SetStyleBySelf();
-            }
-            else
-            {
-                messageBox.SetStyleBySender();
+                showMessage = true;
             }
 
-            messageBox.SetBGSize();
+            if (containUsername == false || showMessage)
+            {
+                UIMessageBox messageBox = Instantiate(m_MessageBox);
+
+                messageBox.transform.SetParent(m_MessagePanel);
+                messageBox.SetText(data.Nickname + ": " + message);
+                messageBox.transform.localScale = Vector3.one;
+
+                if (data.ID == User.Local.Data.ID)
+                {
+                    messageBox.SetStyleBySelf();
+                }
+                else
+                {
+                    messageBox.SetStyleBySender();
+                }
+            }
         }
     }
 }
